@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-xl">
+  <q-page class="bg-grey-4 q-pa-xl">
     <div class="text-h4">Cadastrar Nota</div>
     <q-form class="q-mt-lg" @submit="onSubmit">
       <div class="q-gutter-y-md">
@@ -30,17 +30,16 @@
       </div>
       <div class="q-mt-md q-gutter-x-md">
         <q-btn
-          outline
           :disable="carregando"
           @click="$router.back()"
           color="primary"
-          label="Voltar"
+          label="Cancel"
         />
         <q-btn
           :loading="carregando"
           :disable="carregando"
           type="submit"
-          color="primary"
+          color="secondary"
           label="Submit"
         />
       </div>
@@ -83,7 +82,7 @@ export default {
             message: `Nota ${data.title} cadastrada com sucesso!`,
           });
         }
-        this.onReset()
+        this.onReset();
       } catch (error) {
         this.carregando = false;
         console.log("DEU RUIM ERRO", error);

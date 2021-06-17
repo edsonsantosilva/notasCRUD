@@ -2,9 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header>
       <q-toolbar>
-        <q-toolbar-title>
-          Notas
-        </q-toolbar-title>
+        <q-toolbar-title> CRUD DE NOTAS </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -15,12 +13,10 @@
 </template>
 
 <script>
-
 export default {
-  name: 'MainLayout',
-  data () {
-    return {
-    }
-  }
-}
+  name: "MainLayout",
+  data() {
+    return {};
+  },
+};
 </script>

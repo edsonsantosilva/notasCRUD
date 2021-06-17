@@ -1,6 +1,6 @@
 <template>
-  <q-page class="q-pa-xl">
-    <q-dialog v-model="dialog" persistent>
+  <q-page class="bg-black q-pa-xl">
+    <q-dialog id="deletar" v-model="dialogDelet" persistent>
       <q-card>
         <q-card-section class="row items-center">
           Você deseja realmente apagar {{ selected.length }} itens?
@@ -18,31 +18,63 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog id="editar" v-model="dialogEdit" persistent>
+      <q-card>
+        <q-card-section>
+          <q-input label="Id Nota" v-model="editedNota.id"></q-input>
+          <q-input label="Título" v-model="editedNota.title"></q-input>
+          <q-input label="Valor" v-model="editedNota.value"></q-input>
+          <q-input label="Imposto" v-model="editedNota.taxes"></q-input>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" color="primary" v-close-popup />
+          <q-btn
+            flat
+            label="Atualizar"
+            color="primary"
+            v-close-popup
+            @click="editItem"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
-    <div class="text-right">
+    <div class="text-right q-gutter-x-md">
       <q-btn
         unelevated
         color="primary"
         label="Cadastrar nota"
         :to="{ name: 'NewNote' }"
       />
+      <q-btn
+        unelevated
+        color="secondary"
+        label="Testar Data"
+        :to="{ name: 'ValidateDate' }"
+      />
     </div>
     <div class="q-pa-md">
       <q-table
         dense
         :data="dataTable"
-        :columns="columns"
+        :columns="columnsInfo"
         row-key="id"
         :loading="carregando"
         selection="multiple"
         :selected.sync="selected"
       />
-      <div class="q-mt-lg">
+      <div class="q-mt-md q-gutter-x-md">
         <q-btn
           v-show="selected.length > 0"
           color="negative"
           label="Apagar selecionados"
-          @click="dialog = true"
+          @click="dialogDelet = true"
+        />
+        <q-btn
+          v-show="selected.length > 0"
+          color="primary"
+          label="Editar selecionados"
+          @click="editNota"
         />
       </div>
     </div>
@@ -50,64 +82,42 @@
 </template>
 
 <script>
+import { columns } from "../utils/columns";
 export default {
   name: "PageIndex",
-
   async created() {
-    await this.fetchData()
-    // const response = fetch('http://localhost:3000/notas')
-    // response.then(result => {
-    //   console.log('TUDO CERTO Result')
-    //   this.carregando = false
-    //   if (result.ok) {
-    //     const dtJson = result.json()
-    //     dtJson.then(jsonResult => {
-    //       this.data = jsonResult
-    //     })
-    //   }
-    // })
-    // response.catch(error => {
-    //   this.carregando = false
-    //   console.log('OCORREU UM ERRO', error)
-    //   this.$q.notify({
-    //     position: 'top-left',
-    //     color: 'negative',
-    //     message: error.message
-    //   })
-    // })
+    await this.fetchData();
   },
-
   data() {
     return {
       carregando: false,
-      columns: [
-        {
-          name: "id",
-          required: true,
-          label: "id",
-          align: "center",
-          field: "id",
-          sortable: true,
-        },
-        { name: "title", align: "center", label: "Titulo", field: "title" },
-        {
-          name: "value",
-          align: "center",
-          label: "Valor",
-          field: "value",
-          sortable: true,
-        },
-        { name: "taxes", label: "Imposto", field: "taxes", sortable: true },
-        { name: "trash", label: "apagar", field: "trash", sortable: false },
-      ],
-
+      columnsInfo: columns,
       dataTable: [],
       selected: [],
-      dialog: false,
+      editedNota: {
+        id: null,
+        taxes: null,
+        title: "",
+        value: null
+      },
+      dialogDelet: false,
+      dialogEdit: false
     };
   },
-
   methods: {
+    editNota(){
+      console.log("selected", this.selected);
+      this.editedNota = this.selected[0]
+      this.dialogEdit = true
+    },
+    notifyError(error){
+      console.log("OCORREU UM ERRO", error);
+        this.$q.notify({
+          position: "top-left",
+          color: "negative",
+          message: error.message,
+        });
+    },
     getSelectedString() {
       return this.selected.length === 0
         ? ""
@@ -115,45 +125,51 @@ export default {
             this.selected.length > 1 ? "s" : ""
           } selected of ${this.data.length}`;
     },
-
+    async editItem(){
+      const body = {...this.editedNota}
+      console.log("body edit",body);
+      try {
+        await fetch("http://localhost:3000/notas", {
+          method: "PUT",
+          body: JSON.stringify(body)
+        });
+        this.$q.notify({
+          position: "top-left",
+          color: "positive",
+          text: "black",
+          message: `Notas Editadas com sucesso`,
+        });
+      } catch (error) {
+        notifyError(error)
+      }
+    },
     async deleteItems() {
       const body = {
         ids: [],
       };
-
       for (const item of this.selected) {
         body.ids.push(item.id);
       }
-
       console.log("body", JSON.stringify(body));
-
       try {
         await fetch("http://localhost:3000/notas", {
           method: "DELETE",
           body: JSON.stringify(body),
         });
-
         this.$q.notify({
           position: "top-left",
           color: "positive",
           text: "black",
-          message: `Itens deletas com sucesso`,
+          message: `Notas deletadas com sucesso`,
         });
-        await this.fetchData()
-        this.selected.length = 0
+        await this.fetchData();
+        this.selected.length = 0;
       } catch (error) {
-        console.log("OCORREU UM ERRO", error);
-        this.$q.notify({
-          position: "top-left",
-          color: "negative",
-          message: error.message,
-        });
+        notifyError(error)
       }
     },
-
     async fetchData() {
       this.carregando = true;
-
       try {
         const response = await fetch("http://localhost:3000/notas");
         if (response.ok) {
@@ -162,12 +178,7 @@ export default {
         }
       } catch (error) {
         this.carregando = false;
-        console.log("OCORREU UM ERRO", error);
-        this.$q.notify({
-          position: "top-left",
-          color: "negative",
-          message: error.message,
-        });
+        notifyError(error)
       }
     },
   },
