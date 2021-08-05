@@ -1,7 +1,7 @@
 <template>
   <q-page class="bg-grey-4 q-pa-xl">
     <div class="text-h4">Cadastrar Nota</div>
-    <q-form class="q-mt-lg" @submit="onSubmit">
+    <q-form class="q-mt-lg" @submit.prevent="onSubmit">
       <div class="q-gutter-y-md">
         <q-input
           outlined
@@ -49,6 +49,13 @@
 
 <script>
 export default {
+  props: {
+    id: {
+      required: false,
+      type: String,
+      default: null
+    }
+  },
   data() {
     return {
       carregando: false,
@@ -65,13 +72,11 @@ export default {
         value: this.value,
         taxes: this.taxes,
       });
-
       try {
         const response = await fetch("http://localhost:3000/notas", {
           method: "POST",
           body,
         });
-
         if (response.ok) {
           this.carregando = false;
           const data = await response.json();
@@ -85,7 +90,7 @@ export default {
         this.onReset();
       } catch (error) {
         this.carregando = false;
-        console.log("DEU RUIM ERRO", error);
+        console.log("Ocorreu um problema: ", error);
         this.$q.notify({
           position: "top-left",
           color: "negative",
@@ -93,7 +98,6 @@ export default {
         });
       }
     },
-
     onReset() {
       this.title = null;
       this.value = null;

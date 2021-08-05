@@ -7,7 +7,12 @@ export const columns = [
     field: "id",
     sortable: true
   },
-  { name: "title", align: "center", label: "Titulo", field: "title" },
+  {
+     name: "title", 
+    align: "center", 
+    label: "Titulo", 
+    field: "title" 
+  },
   {
     name: "value",
     align: "center",
@@ -15,8 +20,16 @@ export const columns = [
     field: "value",
     sortable: true
   },
-  { name: "taxes", label: "Imposto", field: "taxes", sortable: true },
-  { name: "trash", label: "Apagar", field: "trash", sortable: false }
+  { 
+    name: "taxes", 
+    label: "Imposto", 
+    field: "taxes", 
+    sortable: true 
+  },
+  { 
+    name: "trash", 
+    label: "Apagar", 
+    field: "trash", 
+    sortable: false 
+  }
 ];
-
-
