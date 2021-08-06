@@ -1,6 +1,6 @@
 <template>
   <q-page class="bg-grey-4 q-pa-xl">
-    <div class="text-h4">Cadastrar Nota</div>
+    <div class="text-h4">{{ id ? `Editar Nota` : `Cadastrar Nota` }}</div>
     <q-form class="q-mt-lg" @submit.prevent="onSubmit">
       <div class="q-gutter-y-md">
         <q-input
@@ -50,15 +50,26 @@
 <script>
 export default {
   props: {
-    id: {
+    editedNota: {
       required: false,
-      type: String,
+      type: Object,
       default: null
+    }
+  },
+  created() {
+    console.log("editedNota novanota", this.editedNota)
+    if (this.editedNota) {
+      let {id, title, value, taxes} = this.editedNota
+      this.id = id
+      this.title = title
+      this.value = value
+      this.taxes = taxes
     }
   },
   data() {
     return {
       carregando: false,
+      id: null,
       title: null,
       value: null,
       taxes: null,

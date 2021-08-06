@@ -106,9 +106,11 @@ export default {
   },
   methods: {
     editNota(){
-      console.log("selected", this.selected);
+      console.log("selected", this.selected)
       this.editedNota = this.selected[0]
-      this.dialogEdit = true
+      console.log("editedNota", this.editedNota)
+      this.$router.push({ name: "NewNote", params: {editedNota: this.editedNota} })
+      // this.dialogEdit = true
     },
     notifyError(error){
       console.log("OCORREU UM ERRO", error);
